@@ -2,7 +2,7 @@
 
 **Chaos testing for AI agents.** Poltergeist is an open-source MCP proxy that haunts your agent on purpose — prompt injections, schema changes, timeouts and lies — then scores how it holds up and shrinks every failure to a minimal, replayable test case.
 
-> Status: in development for Kiroween 2026 (Frankenstein category).
+> Status: in development for Kiroween 2026 (Frankenstein category). The proxy core is working; hauntings, oracles and shrinking are next.
 
 ## How it works
 
@@ -24,6 +24,43 @@ The agent talks to Poltergeist as if it were the server. Poltergeist forwards th
 | Error storm | Fails, then succeeds on retry | Does it retry sensibly and report honestly? |
 
 Every run is recorded and judged by **oracles** (canary leak, forbidden call, injection obedience, task completed, recovery, spotted the lie), which roll up into a 0–100 **resilience score**. Failures are **shrunk** to the smallest plan that still fails and saved as regression tests.
+
+## Try it
+
+Requires Node 22 and pnpm.
+
+```bash
+pnpm install
+pnpm build
+pnpm test
+```
+
+Wrap any stdio MCP server (every run is recorded to `.poltergeist/runs/<runId>.jsonl`):
+
+```bash
+node packages/cli/dist/bin.js wrap -- node my-mcp-server.js
+```
+
+In an MCP client config, use Poltergeist as the server command:
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "command": "node",
+      "args": ["/path/to/poltergeist/packages/cli/dist/bin.js", "wrap", "--", "node", "/path/to/my-mcp-server.js"]
+    }
+  }
+}
+```
+
+Wrap a Streamable HTTP server instead:
+
+```bash
+node packages/cli/dist/bin.js wrap --upstream https://example.com/mcp --listen 8808
+```
+
+Options: `--plan <file>`, `--record <dir>`, `--no-record`, `--redact <regex>` (repeatable), `--log-level <level>`.
 
 ## Safety
 

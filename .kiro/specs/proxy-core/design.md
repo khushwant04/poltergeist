@@ -91,6 +91,11 @@ type TraceLine =
   | { type: "llm"; i: number; requestHash: string; response: unknown };   // written by the reference agent (replay spec)
 ```
 
+### Trace timing
+Each frame line is written at the moment its `seq` is allocated, with a `delivery` field: `sent`, `delayed`,
+`dropped` or `held`. Duplicate copies and injected messages get their own seq when they are sent. This keeps
+`seq` strictly increasing in trace order even when effects reorder delivery.
+
 ## Correctness Properties
 
 ### Property 1: Pass-through is invisible
@@ -133,8 +138,8 @@ For any run that also emits log output, every line written to stdout parses as a
 ## Error Handling
 
 - Child fails to spawn → exit 2 with the command and OS error.
-- Malformed JSON from either side → recorded as an event and forwarded byte-for-byte (the agent's or server's
-  own error handling is part of what is being tested).
+- A line from the server that is not JSON-RPC → recorded as a `malformed_message` event (first 2,000 characters)
+  and dropped. The agent side uses the SDK's stdio transport, which validates messages itself.
 - Recorder write failure → log to stderr and keep proxying; a run must not die because a disk is full.
 
 ## Testing Strategy

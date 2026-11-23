@@ -1,0 +1,26 @@
+{
+  "name": "@poltergeist/proxy",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@poltergeist/core": "workspace:*",
+    "ulid": "3.0.2"
+  },
+  "devDependencies": {
+    "zod": "4.6.7"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@poltergeist/core": ["packages/core/src/index.ts"],
+      "@poltergeist/core/testing": ["packages/core/src/testing/index.ts"],
+      "@poltergeist/proxy": ["packages/proxy/src/index.ts"],
+      "@poltergeist/cli": ["packages/cli/src/wrap.ts"]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts", "vitest.config.ts"]
+}
