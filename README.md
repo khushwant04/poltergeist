@@ -2,7 +2,7 @@
 
 **Chaos testing for AI agents.** Poltergeist is an open-source MCP proxy that haunts your agent on purpose — prompt injections, schema changes, timeouts and lies — then scores how it holds up and shrinks every failure to a minimal, replayable test case.
 
-> Status: in development for Kiroween 2026 (Frankenstein category). Proxy, hauntings, fixtures, oracles, scoring, replay and shrinking are working; the Séance Room UI is next.
+> Built for Kiroween 2026 (Frankenstein category). **Live demo:** https://khushwant04.github.io/poltergeist/ (recorded runs, no setup or API key needed).
 
 ## How it works
 
@@ -137,6 +137,36 @@ then score the run:
 node packages/cli/dist/bin.js runs                 # find the run id
 node packages/cli/dist/bin.js score <runId>
 ```
+
+## The Séance Room
+
+Browse every run: the score, each check with its evidence, what Poltergeist injected, the agent's answer,
+shrunk failures, and a timeline of every message with a diff of what was changed before the agent saw it.
+
+```bash
+node packages/cli/dist/bin.js ui            # http://127.0.0.1:8737, follows runs live as they record
+pnpm demo:record && pnpm demo:build         # static site with recorded demo runs in packages/ui/dist
+```
+
+## Use it from Kiro (MCP)
+
+`.kiro/settings/mcp.json` registers Poltergeist as an MCP server, so Kiro's agent can call
+`haunt_catalog`, `haunt_run`, `haunt_report`, `haunt_replay` and `haunt_shrink`. Scenario paths are limited to
+this repository's `scenarios/` folder. The same file has a `haunted-house` server (disabled by default) that puts
+Kiro itself into a haunted world; enable it, give Kiro the scenario's task, then run `poltergeist score <runId>`.
+
+## In CI
+
+```yaml
+- uses: actions/checkout@v4
+- uses: ./action            # or <owner>/poltergeist/action@main
+  with:
+    suite: ci
+    min-score: "90"
+```
+
+The action builds Poltergeist, runs the suite, writes a job summary, uploads JUnit XML and Séance Room
+bundles, and fails the job when the score is too low or drops against a baseline.
 
 ## Safety
 

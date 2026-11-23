@@ -8,9 +8,11 @@
     "build": "pnpm -r --workspace-concurrency=1 run build",
     "test": "vitest run",
     "test:prop": "vitest run prop.test",
-    "lint": "tsc -p tsconfig.json --noEmit && node scripts/lint.mjs",
+    "lint": "tsc -p tsconfig.json --noEmit && tsc -p packages/ui/tsconfig.json --noEmit && node scripts/lint.mjs",
     "poltergeist": "tsx packages/cli/src/bin.ts",
     "demo": "node packages/cli/dist/bin.js run --suite demo --agent reference",
+    "demo:record": "tsx --tsconfig tsconfig.json scripts/record-demo.ts",
+    "demo:build": "node scripts/demo-build.mjs",
     "ci:suite": "node packages/cli/dist/bin.js run --suite ci --quiet --junit poltergeist-junit.xml --min-score 90"
   },
   "devDependencies": {

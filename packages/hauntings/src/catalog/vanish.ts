@@ -5,6 +5,8 @@ import { toolTargetArb } from "./injection-common.js";
 /** Never delivers the response, so the agent's call hangs until it times out. */
 export const vanish: Haunting<Record<string, never>> = {
   id: "vanish",
+  summary: "The response to a call never arrives.",
+  tests: "Does the agent time out and recover without looping forever?",
   family: "timing",
   requires: [],
   entry(ctx) {

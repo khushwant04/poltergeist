@@ -5,6 +5,10 @@ import { runHaunt, runList, runScore } from "./live-commands.js";
 import { runPlan } from "./plan-command.js";
 import { runRegressionSuite, runReplay, runShrink } from "./replay-commands.js";
 import { runRun } from "./run-command.js";
+import { runMcp } from "./mcp-server.js";
+import { startUiServer } from "./ui-server.js";
+import { exportBundles } from "@poltergeist/runner";
+import { resolve } from "node:path";
 import { runWrap } from "./wrap.js";
 
 const program = new Command()
@@ -117,6 +121,45 @@ program
   .option("--limit <n>", "how many", "20")
   .action((opts) => {
     process.exit(runList(opts));
+  });
+
+program
+  .command("ui")
+  .description("Open the Séance Room on your local runs (follows runs that are still recording)")
+  .option("--port <n>", "port", "8737")
+  .option("--host <host>", "host to bind (default 127.0.0.1)")
+  .option("--home <dir>", "where runs are stored (default .poltergeist)")
+  .option("--live", "accepted for compatibility; live runs are always followed")
+  .action(async (opts: { port: string; host?: string; home?: string }) => {
+    const ui = await startUiServer({ port: Number(opts.port), ...(opts.host ? { host: opts.host } : {}), ...(opts.home ? { home: opts.home } : {}) });
+    process.stderr.write(`[poltergeist] Séance Room at ${ui.url}\n`);
+  });
+
+program
+  .command("export")
+  .description("Write run bundles (and an index and catalogue) for the static Séance Room")
+  .argument("[runIds...]", "runs to export (default: all)")
+  .requiredOption("--out <dir>", "output folder (bundles/ is created inside it)")
+  .option("--home <dir>", "where runs are stored (default .poltergeist)")
+  .option("--regressions <dir>", "regression cases to attach as shrink results", "scenarios/regressions")
+  .option("--redact <regex>", "redact matches before writing (repeatable)", (v: string, acc: string[]) => [...acc, v], [] as string[])
+  .action(async (runIds: string[], opts: { out: string; home?: string; regressions: string; redact: string[] }) => {
+    const index = await exportBundles(resolve(opts.out), runIds.length > 0 ? runIds : "all", {
+      regressionsDir: resolve(opts.regressions),
+      redact: opts.redact.map((r) => new RegExp(r, "g")),
+      ...(opts.home ? { home: opts.home } : {}),
+    });
+    process.stderr.write(`[poltergeist] exported ${index.runs.length} run(s) to ${resolve(opts.out, "bundles")}\n`);
+    process.exit(0);
+  });
+
+program
+  .command("mcp")
+  .description("Run Poltergeist as an MCP server (stdio) so an IDE agent can run, report, replay and shrink hauntings")
+  .option("--root <dir>", "repository root (scenarios/ must be inside it)", process.cwd())
+  .option("--home <dir>", "where runs are stored (default <root>/.poltergeist)")
+  .action(async (opts: { root: string; home?: string }) => {
+    await runMcp(opts);
   });
 
 program.passThroughOptions(false);

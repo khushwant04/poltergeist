@@ -1,5 +1,6 @@
 export * from "./canaries.js";
 export * from "./canonical-json.js";
+export * from "./bundle.js";
 export * from "./clock.js";
 export * from "./errors.js";
 export * from "./hash.js";

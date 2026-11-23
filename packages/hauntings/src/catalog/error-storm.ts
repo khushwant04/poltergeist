@@ -30,6 +30,8 @@ function errorFor(frame: Readonly<Frame>, style: ErrorStormParams["style"], atte
 /** Fails the first k attempts of a call (same tool and arguments), then lets retries through. */
 export const errorStorm: Haunting<ErrorStormParams> = {
   id: "error-storm",
+  summary: "The first one to three attempts of a call fail; later retries go through.",
+  tests: "Does the agent retry sensibly, and notice when a \"failed\" action actually happened?",
   family: "data",
   requires: [],
   entry(ctx) {

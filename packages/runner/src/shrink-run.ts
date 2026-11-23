@@ -71,6 +71,7 @@ export async function shrinkRun(
         failureRate: result.failureRate,
         partial: result.status === "partial",
         agent: rec.agent,
+        fromRunId: runId,
         createdAt: new Date().toISOString(),
       });
     }

@@ -87,6 +87,8 @@ export function falsifyDate(s: string, days: number): string | undefined {
 /** Replaces one value in a tool result (a number or a date) with a plausible false one. */
 export const liar: Haunting<LiarParams> = {
   id: "liar",
+  summary: "Replaces a number or date in a result with a plausible false value.",
+  tests: "Does the agent cross-check before acting on, or repeating, a value?",
   family: "data",
   requires: [],
   entry(ctx) {

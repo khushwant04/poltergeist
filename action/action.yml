@@ -1,0 +1,91 @@
+name: Poltergeist
+description: Haunt your AI agent in CI and fail the build when its resilience score is too low or drops.
+author: Poltergeist
+branding:
+  icon: alert-triangle
+  color: purple
+
+inputs:
+  suite:
+    description: Suite name (from scenarios/suites) or path
+    default: ci
+  agent:
+    description: "Agent to run: fake, reference or reference-hardened (default: the suite's agent, else fake)"
+    default: ""
+  min-score:
+    description: Fail when the suite score is below this
+    default: ""
+  max-drop:
+    description: Fail when the score drops more than this many points against the baseline
+    default: ""
+  baseline:
+    description: 'Baseline JSON file, e.g. {"score": 92}; skipped if missing'
+    default: ""
+  working-directory:
+    description: Where the Poltergeist checkout is
+    default: "."
+
+outputs:
+  score:
+    description: The suite's resilience score (0–100)
+    value: ${{ steps.haunt.outputs.score }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Install and build Poltergeist
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        corepack enable
+        pnpm install --frozen-lockfile
+        pnpm build
+
+    - name: Haunt the agent
+      id: haunt
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SUITE: ${{ inputs.suite }}
+        AGENT: ${{ inputs.agent }}
+        MIN_SCORE: ${{ inputs.min-score }}
+        MAX_DROP: ${{ inputs.max-drop }}
+        BASELINE: ${{ inputs.baseline }}
+      run: |
+        args=(run --suite "$SUITE" --quiet --junit poltergeist-junit.xml --json poltergeist-summary.json)
+        [ -n "$AGENT" ] && args+=(--agent "$AGENT")
+        [ -n "$MIN_SCORE" ] && args+=(--min-score "$MIN_SCORE")
+        [ -n "$MAX_DROP" ] && args+=(--max-drop "$MAX_DROP")
+        [ -n "$BASELINE" ] && args+=(--baseline "$BASELINE")
+        set +e
+        node packages/cli/dist/bin.js "${args[@]}" 2>&1 | tee poltergeist-output.txt
+        code=${PIPESTATUS[0]}
+        set -e
+        score=$(node -e 'try { console.log(require("./poltergeist-summary.json").score) } catch { console.log("") }')
+        echo "score=$score" >> "$GITHUB_OUTPUT"
+        {
+          echo "## 👻 Poltergeist: \`$SUITE\` suite"
+          echo
+          echo "**Resilience score: ${score:-n/a}**"
+          echo
+          echo '```'
+          cat poltergeist-output.txt
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+        node packages/cli/dist/bin.js export --out poltergeist-report || true
+        exit "$code"
+
+    - name: Upload report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: poltergeist-report
+        path: |
+          ${{ inputs.working-directory }}/poltergeist-junit.xml
+          ${{ inputs.working-directory }}/poltergeist-summary.json
+          ${{ inputs.working-directory }}/poltergeist-report/
+        if-no-files-found: ignore

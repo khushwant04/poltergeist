@@ -14,15 +14,16 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
     "@poltergeist/core": "workspace:*",
     "@poltergeist/hauntings": "workspace:*",
     "@poltergeist/oracles": "workspace:*",
     "@poltergeist/proxy": "workspace:*",
     "@poltergeist/runner": "workspace:*",
     "commander": "15.1.0",
-    "yaml": "2.9.1"
+    "ulid": "3.0.2",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
   },
-  "devDependencies": {
-    "@modelcontextprotocol/sdk": "1.32.2"
-  }
+  "devDependencies": {}
 }

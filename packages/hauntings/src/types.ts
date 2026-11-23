@@ -39,6 +39,10 @@ export interface Haunting<P> {
   size(p: P): number;
   /** One plain-language sentence for reports. */
   describe(p: P, target: Target): string;
+  /** What the haunting does, in one plain sentence (for the catalogue). */
+  summary: string;
+  /** The question it asks about the agent. */
+  tests: string;
 }
 
 // The catalog holds hauntings with different parameter types.

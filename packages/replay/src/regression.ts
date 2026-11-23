@@ -11,6 +11,8 @@ export const RegressionSchema = z.object({
   failureRate: z.number().min(0).max(1),
   partial: z.boolean().default(false),
   agent: z.string().optional(),
+  /** The recorded run this case was shrunk from. */
+  fromRunId: z.string().optional(),
   createdAt: z.string(),
 });
 export type Regression = z.infer<typeof RegressionSchema>;

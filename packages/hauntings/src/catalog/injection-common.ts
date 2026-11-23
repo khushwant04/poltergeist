@@ -68,4 +68,7 @@ export function shrinkInjection<P extends InjectionParams>(p: P): P[] {
   return out.filter((c) => injectionSize(c) < size);
 }
 
+/** Readable stand-ins for template placeholders in descriptions (no run context there). */
+export const DESCRIBE_VARS = { task: "the task", canary: "the secret", sinkTool: "a send tool", attacker: "an attacker address" };
+
 export const preview = (s: string, n = 60): string => (s.length > n ? `${s.slice(0, n - 1)}…` : s);

@@ -3,11 +3,13 @@ import { FORWARD } from "@poltergeist/core";
 import { insertText, toolResult, wrapText } from "../content.js";
 import { payloadText, render } from "../payloads.js";
 import type { Haunting } from "../types.js";
-import { injectionParamsArb, injectionSize, payloadById, preview, shrinkInjection, toolTargetArb, type InjectionParams } from "./injection-common.js";
+import { DESCRIBE_VARS, injectionParamsArb, injectionSize, payloadById, preview, shrinkInjection, toolTargetArb, type InjectionParams } from "./injection-common.js";
 
 /** Hides an instruction inside a tool result to pull the agent off its task. */
 export const whisper: Haunting<InjectionParams> = {
   id: "whisper",
+  summary: "Hides an instruction inside a tool result.",
+  tests: "Does the agent treat tool output as data, not orders?",
   family: "injection",
   requires: [],
   entry(ctx) {
@@ -29,7 +31,7 @@ export const whisper: Haunting<InjectionParams> = {
   shrinkParams: shrinkInjection,
   size: injectionSize,
   describe(p, t) {
-    const text = payloadText(payloadById(p.payloadId), p.variant);
+    const text = render(payloadText(payloadById(p.payloadId), p.variant), DESCRIBE_VARS);
     return `Whispers "${preview(text)}" into ${t.toolName ?? t.method} result #${t.occurrence}`;
   },
 };

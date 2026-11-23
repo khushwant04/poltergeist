@@ -32,6 +32,8 @@ export interface RunOptions {
    * against the original run's final world.
    */
   replay?: { upstream: Transport; worldDir: string };
+  /** Use this run id (so a caller can report it before the run finishes). */
+  runId?: string;
 }
 
 export interface RunResult {
@@ -58,7 +60,7 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
   const { scenario } = loaded;
   const trial = opts.trial ?? 1;
   const home = homeDir(opts.home);
-  const runId = ulid();
+  const runId = opts.runId ?? ulid();
   const tracePath = join(home, "runs", `${runId}.jsonl`);
   const worldDir = join(home, "worlds", runId);
 

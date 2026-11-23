@@ -62,6 +62,26 @@ upload artifacts, write `$GITHUB_STEP_SUMMARY`. The exit code comes from the run
 ### Hosted demo
 `pnpm demo:build` = build UI + copy `demo/bundles/*` (recorded with the reference agent, committed) into `dist/bundles`.
 
+## Implementation notes (as built)
+
+- **One server, no event bus.** `poltergeist ui` builds bundles on demand from `.poltergeist/` (cached by
+  trace modification time) and follows a run still being recorded by tailing its trace file over
+  server-sent events. So it works with `run` and `haunt` running in other processes. A run is live until
+  its trace has a `plan_summary` event. Event-stream headers are flushed immediately so clients connect at once.
+- **The UI imports only `core/src/bundle.ts`** (types and `lineToFrame`, no runtime dependencies) through a
+  Vite alias, so the static build stays small (about 87 kB gzipped).
+- **Readable diffs.** Tool results are JSON inside strings; the diff expands embedded JSON and multi-line
+  text first, and folds long unchanged stretches, so the injected lines are what the reader sees.
+- **Plain labels.** Every themed name has a plain one ("Possession · bait to leak a secret"), checks have
+  failure wording ("Leaked a secret"), and agents get friendly names ("Scripted, gullible · falls for possession").
+- **Accessibility.** The browser smoke test runs axe on the runs, run and catalogue pages and fails on
+  serious or critical violations. It caught three: link names that did not contain their visible text,
+  and scrollable text boxes that keyboard users could not reach.
+- **Hauntings carry `summary` and `tests`** strings for the catalogue; shrink results are linked to their
+  run through `fromRunId` in the regression file.
+- **Demo data** is recorded with the scripted agents (`pnpm demo:record`), so the hosted demo needs no key.
+- **Kiro:** `.kiro/settings/mcp.json` registers `poltergeist mcp`, plus a disabled `haunted-house` live-mode server.
+
 ## Correctness Properties
 
 ### Property 1: Bundle round trip

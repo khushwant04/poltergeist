@@ -15,5 +15,6 @@
       "@poltergeist/cli": ["packages/cli/src/wrap.ts"]
     }
   },
-  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts", "vitest.config.ts"]
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts", "vitest.config.ts"],
+  "exclude": ["packages/ui/src/**"]
 }

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "poltergeist": {
+      "command": "node",
+      "args": ["packages/cli/dist/bin.js", "mcp"],
+      "disabled": false,
+      "autoApprove": ["haunt_catalog", "haunt_report"]
+    },
+    "haunted-house": {
+      "command": "node",
+      "args": ["packages/cli/dist/bin.js", "haunt", "--scenario", "inbox-summary", "--seed", "3", "--log-level", "warn"],
+      "disabled": true,
+      "autoApprove": []
+    }
+  }
+}
