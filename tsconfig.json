@@ -7,6 +7,7 @@
       "@poltergeist/core": ["packages/core/src/index.ts"],
       "@poltergeist/core/testing": ["packages/core/src/testing/index.ts"],
       "@poltergeist/proxy": ["packages/proxy/src/index.ts"],
+      "@poltergeist/hauntings": ["packages/hauntings/src/index.ts"],
       "@poltergeist/cli": ["packages/cli/src/wrap.ts"]
     }
   },

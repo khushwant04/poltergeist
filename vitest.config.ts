@@ -9,6 +9,7 @@ export default defineConfig({
       { find: /^@poltergeist\/core\/testing$/, replacement: src("./packages/core/src/testing/index.ts") },
       { find: /^@poltergeist\/core$/, replacement: src("./packages/core/src/index.ts") },
       { find: /^@poltergeist\/proxy$/, replacement: src("./packages/proxy/src/index.ts") },
+      { find: /^@poltergeist\/hauntings$/, replacement: src("./packages/hauntings/src/index.ts") },
     ],
   },
   test: {

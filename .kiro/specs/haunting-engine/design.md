@@ -97,6 +97,25 @@ short:
 Loader checks: every email or URL domain ends in `.invalid`; possession payloads contain `{{canary}}`;
 rendering uses a simple `{{name}}` replace with no code execution.
 
+## Implementation notes (as built)
+
+- **`entry(ctx)` instead of separate `targets` and `params`.** Each haunting returns one arbitrary for a whole
+  entry (target and params together), or `null` when it cannot apply to the scenario (e.g. possession without
+  sinks or canaries, liar without lie targets). Liar and rug-pull need the target and params to agree.
+- **`follows(input)`** lets an entry act on frames other than its target: error-storm on retries with the
+  same tool and canonical arguments, rug-pull on the `tools/list` after its notification. Per-entry state
+  lives in the engine; `apply` returns the next state.
+- **Causes.** Hauntings return a placeholder cause; the engine stamps the real `entryIndex` on every effect.
+- **Effects carry the haunted message.** `delay`, `duplicate` and `hold` take an optional `msg`, and an
+  `inject` can wrap a `replace`, so a changed message can also be delayed or followed by an injected one.
+- **Scenario schema and canaries live in `core`** (`ScenarioSchema`, `deriveCanaries`, `SeededRng`) because
+  hauntings, oracles, fixtures and the runner all need them.
+- **Whisper position `between`** (a new content item in the middle) replaces `inside`, so original items are never edited.
+- **Liar dates** use integer day arithmetic (no `Date` objects), keeping hauntings free of ambient time.
+- **CLI:** `poltergeist wrap --seed <n> --scenario <file>`, `wrap --plan <file> --scenario <file>`, and
+  `poltergeist plan --seed <n> --scenario <file>`. Applied hauntings and a final `plan_summary` (unfired
+  entries) are written to the trace as events.
+
 ## Data Models
 Plan (above); `AppliedHaunting` events in the trace: `{ entryIndex, haunting, description, record }`.
 

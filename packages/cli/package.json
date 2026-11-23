@@ -4,12 +4,23 @@
   "description": "Chaos testing for AI agents: an MCP proxy that haunts your agent on purpose.",
   "type": "module",
   "license": "Apache-2.0",
-  "bin": { "poltergeist": "./dist/bin.js" },
-  "files": ["dist"],
-  "scripts": { "build": "tsc -p tsconfig.build.json" },
+  "bin": {
+    "poltergeist": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "dependencies": {
     "@poltergeist/core": "workspace:*",
+    "@poltergeist/hauntings": "workspace:*",
     "@poltergeist/proxy": "workspace:*",
-    "commander": "15.1.0"
+    "commander": "15.1.0",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2"
   }
 }

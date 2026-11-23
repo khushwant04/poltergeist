@@ -39,10 +39,10 @@ export interface HauntingRef {
 export type Effect =
   | { kind: "forward" }
   | { kind: "replace"; msg: JSONRPCMessage; cause: HauntingRef }
-  | { kind: "delay"; ms: number; cause: HauntingRef }
+  | { kind: "delay"; ms: number; cause: HauntingRef; msg?: JSONRPCMessage }
   | { kind: "drop"; cause: HauntingRef }
-  | { kind: "duplicate"; copies: number; gapMs: number; cause: HauntingRef }
-  | { kind: "hold"; cause: HauntingRef }
+  | { kind: "duplicate"; copies: number; gapMs: number; cause: HauntingRef; msg?: JSONRPCMessage }
+  | { kind: "hold"; cause: HauntingRef; msg?: JSONRPCMessage }
   | { kind: "inject"; msg: JSONRPCMessage; then: Effect; cause: HauntingRef };
 
 export const FORWARD: Effect = Object.freeze({ kind: "forward" });
@@ -121,7 +121,8 @@ export const TraceEventSchema = z.object({
     "late_response_discarded",
     "hold_timeout",
     "malformed_message",
-    "effect_applied",
+    "haunting_applied",
+    "plan_summary",
   ]),
   detail: z.record(z.string(), z.unknown()),
 });

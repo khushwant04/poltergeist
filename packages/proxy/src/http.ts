@@ -14,8 +14,10 @@ export interface HttpProxyOptions {
   port: number;
   host?: string;
   path?: string;
-  /** Build a fresh interceptor list for each agent session. */
-  interceptors?: () => readonly Interceptor[];
+  /** Build a fresh interceptor list for each agent session (receives the session's proxy for recording). */
+  interceptors?: (record: (name: "haunting_applied" | "plan_summary", detail: Record<string, unknown>) => void) => readonly Interceptor[];
+  /** Called when a session ends, before its trace is closed. */
+  onSessionEnd?: (record: (name: "haunting_applied" | "plan_summary", detail: Record<string, unknown>) => void) => void;
   requires?: readonly string[];
   recordDir?: string | null;
   redaction?: RedactionOptions;
@@ -58,20 +60,24 @@ export async function startHttpProxy(opts: HttpProxyOptions): Promise<HttpProxyH
       },
     });
     const upstream = new StreamableHTTPClientTransport(new URL(opts.upstreamUrl));
+    let proxyRef: Proxy | undefined;
+    const record = (name: "haunting_applied" | "plan_summary", detail: Record<string, unknown>) => proxyRef?.event(name, detail);
     const proxy = new Proxy({
       agent,
       upstream,
       sink,
       logger,
       runId,
-      ...(opts.interceptors ? { interceptors: opts.interceptors() } : {}),
+      ...(opts.interceptors ? { interceptors: opts.interceptors(record) } : {}),
       ...(opts.requires ? { requires: opts.requires } : {}),
       seed: opts.seed ?? null,
       planHash: opts.planHash ?? null,
       scenarioId: opts.scenarioId ?? null,
     });
+    proxyRef = proxy;
     void proxy.closed.then(() => {
       if (agent.sessionId) sessions.delete(agent.sessionId);
+      opts.onSessionEnd?.(record);
       proxy.closeTrace();
     });
     await proxy.start();

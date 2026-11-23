@@ -2,7 +2,7 @@
 
 **Chaos testing for AI agents.** Poltergeist is an open-source MCP proxy that haunts your agent on purpose — prompt injections, schema changes, timeouts and lies — then scores how it holds up and shrinks every failure to a minimal, replayable test case.
 
-> Status: in development for Kiroween 2026 (Frankenstein category). The proxy core is working; hauntings, oracles and shrinking are next.
+> Status: in development for Kiroween 2026 (Frankenstein category). The proxy core and haunting engine are working; oracles, fixtures and shrinking are next.
 
 ## How it works
 
@@ -60,7 +60,14 @@ Wrap a Streamable HTTP server instead:
 node packages/cli/dist/bin.js wrap --upstream https://example.com/mcp --listen 8808
 ```
 
-Options: `--plan <file>`, `--record <dir>`, `--no-record`, `--redact <regex>` (repeatable), `--log-level <level>`.
+Haunt it with a plan generated from a seed (the same seed always gives the same plan):
+
+```bash
+node packages/cli/dist/bin.js plan --seed 42 --scenario scenarios/echo-demo.yaml
+node packages/cli/dist/bin.js wrap --seed 42 --scenario scenarios/echo-demo.yaml -- node my-mcp-server.js
+```
+
+Options: `--seed <n>` with `--scenario <file>`, `--plan <file>`, `--record <dir>`, `--no-record`, `--redact <regex>` (repeatable), `--log-level <level>`.
 
 ## Safety
 

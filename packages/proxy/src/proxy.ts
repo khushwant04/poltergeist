@@ -126,7 +126,7 @@ export class Proxy {
   }
 
   /** Record an event in the trace (used by transports and runners). */
-  event(name: "child_exit" | "malformed_message", detail: Record<string, unknown>): void {
+  event(name: "child_exit" | "malformed_message" | "haunting_applied" | "plan_summary", detail: Record<string, unknown>): void {
     this.sink.write({ type: "event", t: this.pipeline.elapsed(), name, detail });
   }
 

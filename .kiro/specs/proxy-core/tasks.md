@@ -46,8 +46,7 @@
   - _Requirements: 1.1, 1.4, 1.5, 1.6_
 - [x] 5.2 Implement the initialize rewriter interceptor
   - _Requirements: 5.1, 5.2_
-- [ ] 5.3 Implement plan loading (`--plan`, `--seed` + `--scenario`) with exit code 2 on invalid input
-  - Done: `--plan` loading and validation, exit code 2 with the field name. Remaining: `--seed` + `--scenario` needs the haunting engine (exits 2 with "not available yet" until then)
+- [x] 5.3 Implement plan loading (`--plan`, `--seed` + `--scenario`) with exit code 2 on invalid input
   - _Requirements: 7.1, 7.2, 7.3_
 - [x]* 5.4 Write property test for pass-through invisibility
   - **Property 1: Pass-through is invisible**

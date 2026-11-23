@@ -30,25 +30,37 @@ export class EffectExecutor {
 
   private run(frame: Frame, effect: Effect, result: PipelineResult): void {
     const { deps } = this;
+    // An effect may carry its own message (a haunting changed it); otherwise deliver the frame's.
+    const changed = "msg" in effect && effect.msg !== undefined && effect.kind !== "inject";
+    const msg = changed ? (effect as { msg: JSONRPCMessage }).msg : frame.msg;
+    const original = changed ? (result.original ?? frame.msg) : result.original;
+    const out: Frame = changed ? { ...frame, msg } : frame;
+    const view: PipelineResult = original !== undefined ? { ...result, original } : result;
+    const releases = frame.kind === "response";
+
     switch (effect.kind) {
-      case "forward":
+      case "forward": {
+        this.writeFrame(out, view, "sent");
+        this.send(frame.dir, msg, releases);
+        return;
+      }
       case "replace": {
-        this.writeFrame(frame, result, "sent");
-        this.send(frame.dir, frame.msg, frame.kind === "response");
+        this.writeFrame(out, view, "sent", effect.cause);
+        this.send(frame.dir, msg, releases);
         return;
       }
       case "delay": {
-        this.writeFrame(frame, result, "delayed", effect.cause);
-        deps.clock.setTimeout(() => this.send(frame.dir, frame.msg, frame.kind === "response"), effect.ms);
+        this.writeFrame(out, view, "delayed", effect.cause);
+        deps.clock.setTimeout(() => this.send(frame.dir, msg, releases), effect.ms);
         return;
       }
       case "drop": {
-        this.writeFrame(frame, result, "dropped", effect.cause);
+        this.writeFrame(out, view, "dropped", effect.cause);
         return;
       }
       case "duplicate": {
-        this.writeFrame(frame, result, "sent", effect.cause);
-        this.send(frame.dir, frame.msg, frame.kind === "response");
+        this.writeFrame(out, view, "sent", effect.cause);
+        this.send(frame.dir, msg, releases);
         for (let i = 1; i <= effect.copies; i++) {
           deps.clock.setTimeout(() => {
             deps.record({
@@ -56,22 +68,22 @@ export class EffectExecutor {
               seq: deps.nextSeq(),
               dir: frame.dir,
               t: deps.elapsed(),
-              msg: frame.msg as never,
+              msg: msg as never,
               cause: effect.cause,
               copy: i,
               delivery: "sent",
               ...requestFields(frame),
             });
-            this.send(frame.dir, frame.msg, false);
+            this.send(frame.dir, msg, false);
           }, effect.gapMs * i);
         }
         return;
       }
       case "hold": {
-        this.writeFrame(frame, result, "held", effect.cause);
+        this.writeFrame(out, view, "held", effect.cause);
         const entry = {
           dir: frame.dir,
-          msg: frame.msg,
+          msg,
           timer: deps.clock.setTimeout(() => {
             if (!this.held.includes(entry)) return;
             this.held = this.held.filter((h) => h !== entry);

@@ -1,0 +1,12 @@
+# A small scenario for the echo test server (packages/proxy/test/fixtures/echo-server.ts).
+id: echo-demo
+task: "Add 2 and 40, then echo the result"
+tools: [echo, add]
+allowedTools: [echo, add]
+lieTargets:
+  - tool: add
+    pointer: /sum
+    kind: number
+hauntings:
+  maxPerRun: 3
+  maxOccurrence: 2

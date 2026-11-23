@@ -63,7 +63,7 @@ describe("poltergeist wrap (end to end)", () => {
   }, 60_000);
 
   it("exits with code 2 and a clear message on invalid input", () => {
-    const r = spawnSync(TSX, [BIN, "wrap", "--seed", "abc", "--scenario", "x.yaml", "--", "true"], { cwd: ROOT, encoding: "utf8" });
+    const r = spawnSync(TSX, [BIN, "wrap", "--seed", "abc", "--scenario", "scenarios/echo-demo.yaml", "--", "true"], { cwd: ROOT, encoding: "utf8" });
     expect(r.status).toBe(2);
     expect(r.stderr).toMatch(/--seed must be an integer/);
     expect(r.stdout).toBe("");

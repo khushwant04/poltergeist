@@ -22,6 +22,10 @@ export interface StdioProxyOptions {
   /** Override the agent side (defaults to this process's stdin/stdout). */
   agent?: Transport;
   killGraceMs?: number;
+  /** Called once the proxy exists, before any traffic. */
+  onProxy?: (proxy: Proxy) => void;
+  /** Called after the session ends, before the trace is closed. */
+  onFinish?: (proxy: Proxy) => void;
 }
 
 export interface StdioProxyHandle {
@@ -69,6 +73,7 @@ export async function startStdioProxy(opts: StdioProxyOptions): Promise<StdioPro
     scenarioId: opts.scenarioId ?? null,
   });
   proxyRef = proxy;
+  opts.onProxy?.(proxy);
 
   await proxy.start();
 
@@ -82,6 +87,7 @@ export async function startStdioProxy(opts: StdioProxyOptions): Promise<StdioPro
     const who = await proxy.closed;
     if (who !== "upstream") await child.close();
     await child.exited;
+    opts.onFinish?.(proxy);
     proxy.event("child_exit", { code: child.exitCode, signal: child.exitSignal });
     proxy.closeTrace();
     if (who === "upstream") return child.exitCode ?? 1;

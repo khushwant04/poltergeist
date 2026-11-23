@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command, Option } from "commander";
 import { POLTERGEIST_VERSION } from "@poltergeist/core";
+import { runPlan } from "./plan-command.js";
 import { runWrap } from "./wrap.js";
 
 const program = new Command()
@@ -25,6 +26,16 @@ program
   .action(async (command: string[], opts) => {
     const code = await runWrap(command, opts);
     process.exit(code);
+  });
+
+program
+  .command("plan")
+  .description("Show the haunting plan a seed produces for a scenario")
+  .requiredOption("--seed <n>", "seed (0 to 4294967295)")
+  .requiredOption("--scenario <file>", "scenario YAML")
+  .option("--out <file>", "write the plan to a file instead of stdout")
+  .action((opts: { seed: string; scenario: string; out?: string }) => {
+    process.exit(runPlan(opts));
   });
 
 program.passThroughOptions(false);
