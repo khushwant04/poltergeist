@@ -42,7 +42,7 @@ of recorded LLM responses allows exact replay for debugging.
 
 1. WHEN `poltergeist replay <runId> --mode full` is run, THE Replayer SHALL serve LLM responses from the cassette and server responses from the trace, and run the agent loop and the haunting engine for real.
 2. THE Replayer SHALL produce the same message sequence as the original run under canonical JSON.
-3. IF a request hash or a tool call does not match the trace, THEN THE Replayer SHALL stop with a divergence error naming the step and showing the difference.
+3. IF a request hash or a tool call does not match the trace, or any frame differs from the recording, THEN THE Replayer SHALL report a divergence naming the step and showing the expected and actual values.
 4. IF the trace's Poltergeist, catalog or fast-check version differs from the installed one, THEN THE Replayer SHALL refuse to replay unless `--force` is given.
 
 ### Requirement 4: Shrinking

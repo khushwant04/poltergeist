@@ -114,6 +114,27 @@ importers:
         specifier: 4.6.7
         version: 4.6.7
 
+  packages/replay:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: 1.32.2
+        version: 1.32.2(zod@4.6.7)
+      '@poltergeist/core':
+        specifier: workspace:*
+        version: link:../core
+      '@poltergeist/hauntings':
+        specifier: workspace:*
+        version: link:../hauntings
+      '@poltergeist/oracles':
+        specifier: workspace:*
+        version: link:../oracles
+      '@poltergeist/proxy':
+        specifier: workspace:*
+        version: link:../proxy
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+
   packages/runner:
     dependencies:
       '@anthropic-ai/sdk':
@@ -137,6 +158,9 @@ importers:
       '@poltergeist/proxy':
         specifier: workspace:*
         version: link:../proxy
+      '@poltergeist/replay':
+        specifier: workspace:*
+        version: link:../replay
       ulid:
         specifier: 3.0.2
         version: 3.0.2

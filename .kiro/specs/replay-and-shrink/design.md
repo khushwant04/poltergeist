@@ -63,6 +63,21 @@ Plans produced by shrinking keep the original `seed` and `catalogVersion` and ge
 Why our own shrinker rather than fast-check's: every step costs real agent runs, so it must respect an explicit
 budget, vote across trials and report progress. fast-check is still used to generate plans and to test the shrinker.
 
+## Implementation notes (as built)
+
+- **Package split.** `@poltergeist/replay` holds the pure parts (LLM stub, server stub, frame comparison,
+  shrinker, regression files). The runner owns orchestration (`replayRun`, `shrinkRun`, `runRegressions`)
+  because it already knows how to run a scenario, so replay never depends on the runner.
+- **Cassette hash ignores the model id** (`llmRequestHash`: system, tools, messages, max_tokens), so a replay
+  does not need the original model configured.
+- **Divergence = first frame that differs.** After a full replay the new trace is compared with the recording
+  frame by frame (direction, message, delivery, cause), not timing. LLM hash mismatches are reported first.
+- **Agents are rebuilt from the recorded name** (`fake(falls-for:possession)`, `reference(hardened)`).
+- **Shrinker extras:** it tries the empty plan first (a failure with no hauntings is the agent's own bug), stops
+  a candidate's trials early once the majority is decided, and reports `partial` when the budget runs out.
+- **CLI:** `poltergeist replay <runId> [--mode env|full]`, `poltergeist shrink <runId> --target <oracle>`,
+  `poltergeist run --suite regressions` (exit 1 while any case still fails).
+
 ## Data Models
 Regression file:
 ```json
@@ -77,7 +92,8 @@ For any run recorded with the deterministic fake agent, full replay produces the
 **Validates: Requirements 3.1, 3.2**
 
 ### Property 2: Divergence detection
-For any recorded run and any single change to one cassette response or one recorded tool response, full replay stops with a divergence error at the first step affected.
+For any recorded run and any single change to one recorded agent request (a tool call) or one cassette response, full replay reports a divergence at the first step affected.
+(Server responses are served from the recording itself, so changing one alone changes nothing the agent does; it is only a divergence when it no longer matches what the haunting engine produces from the original.)
 **Validates: Requirements 3.3**
 
 ### Property 3: Shrinking keeps a subset

@@ -3,6 +3,7 @@ import { Command, Option } from "commander";
 import { POLTERGEIST_VERSION } from "@poltergeist/core";
 import { runHaunt, runList, runScore } from "./live-commands.js";
 import { runPlan } from "./plan-command.js";
+import { runRegressionSuite, runReplay, runShrink } from "./replay-commands.js";
 import { runRun } from "./run-command.js";
 import { runWrap } from "./wrap.js";
 
@@ -58,8 +59,35 @@ program
   .option("--home <dir>", "where runs are stored (default .poltergeist)")
   .option("--timeout <sec>", "override the scenario's time limit")
   .option("--quiet", "one line per run")
+  .option("--regressions <dir>", "with --suite regressions: where regression cases live", "scenarios/regressions")
   .action(async (opts) => {
-    process.exit(await runRun(opts));
+    process.exit(opts.suite === "regressions" ? await runRegressionSuite(opts) : await runRun(opts));
+  });
+
+program
+  .command("replay")
+  .description("Run a recorded run again: env (same plan, live agent) or full (exact, from the recording)")
+  .argument("<runId>")
+  .option("--mode <mode>", "env or full", "full")
+  .option("--home <dir>", "where runs are stored (default .poltergeist)")
+  .option("--force", "replay even if versions differ")
+  .action(async (runId: string, opts) => {
+    process.exit(await runReplay(runId, opts));
+  });
+
+program
+  .command("shrink")
+  .description("Reduce a failing run to the smallest plan that still fails, and save it as a regression case")
+  .argument("<runId>")
+  .requiredOption("--target <oracle>", "the failing oracle to keep failing (e.g. canary-leak)")
+  .option("--trials <k>", "trials per candidate (majority vote)", "3")
+  .option("--budget <n>", "maximum trials for the search", "40")
+  .option("--home <dir>", "where runs are stored (default .poltergeist)")
+  .option("--regressions <dir>", "where to save the regression case", "scenarios/regressions")
+  .option("--no-save", "do not save a regression case")
+  .option("--force", "shrink even if versions differ")
+  .action(async (runId: string, opts) => {
+    process.exit(await runShrink(runId, opts));
   });
 
 program

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { deriveCanaries, parseTrace, type Plan, type ScenarioContext } from "@poltergeist/core";
 import { createFixtureServer, World, ALL_MODULES, type Module } from "@poltergeist/fixtures";
 import { CATALOG, HauntingEngine, generatePlan, planHash } from "@poltergeist/hauntings";
@@ -26,6 +27,11 @@ export interface RunOptions {
   /** Overrides the scenario's timeout. */
   timeoutSec?: number;
   store?: Store;
+  /**
+   * Full replay: answer the agent from a recording instead of a live fixture server, and judge
+   * against the original run's final world.
+   */
+  replay?: { upstream: Transport; worldDir: string };
 }
 
 export interface RunResult {
@@ -58,16 +64,25 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
 
   const canaries = deriveCanaries(seed, scenario.canaries.count);
   const ctx: ScenarioContext = { scenario, canaries };
-  prepareWorld(loaded.worldDir, worldDir, canaries);
   const plan = opts.plan ?? generatePlan(seed, ctx, CATALOG);
   const hash = planHash(plan);
 
-  // Fixture server and agent both connect in memory; the proxy sits between them.
-  const [proxyUp, fixtureSide] = InMemoryTransport.createLinkedPair();
+  // Fixture server (or a recording) and the agent both connect in memory; the proxy sits between them.
   const [agentSide, proxyAgent] = InMemoryTransport.createLinkedPair();
-  const modules = (scenario.modules.length > 0 ? scenario.modules : ALL_MODULES) as Module[];
-  const fixture = createFixtureServer(new World(worldDir), modules);
-  await fixture.connect(fixtureSide);
+  let proxyUp: Transport;
+  let fixture: { close(): Promise<void> } | undefined;
+  const judgedWorld = opts.replay ? opts.replay.worldDir : worldDir;
+  if (opts.replay) {
+    proxyUp = opts.replay.upstream;
+  } else {
+    prepareWorld(loaded.worldDir, worldDir, canaries);
+    const [up, fixtureSide] = InMemoryTransport.createLinkedPair();
+    proxyUp = up;
+    const modules = (scenario.modules.length > 0 ? scenario.modules : ALL_MODULES) as Module[];
+    const server = createFixtureServer(new World(worldDir), modules);
+    await server.connect(fixtureSide);
+    fixture = server;
+  }
 
   let proxy: Proxy | undefined;
   const engine = new HauntingEngine(plan, ctx, CATALOG, (a) =>
@@ -91,7 +106,7 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
     planHash: hash,
     scenarioId: scenario.id,
   });
-  proxy.event("run_context", { scenarioPath: loaded.path, worldDir, canaries, agent: agent.name, trial, plan });
+  proxy.event("run_context", { scenarioPath: loaded.path, worldDir: judgedWorld, canaries, agent: agent.name, trial, plan, ...(opts.replay ? { replay: true } : {}) });
   await proxy.start();
 
   const client = new Client({ name: `poltergeist-${agent.name}`, version: "0.1.0" });
@@ -130,11 +145,11 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
   proxy.event("plan_summary", { unfired: engine.unfired(), applied: engine.applied.length });
   await client.close().catch(() => {});
   await proxy.close();
-  await fixture.close().catch(() => {});
+  await fixture?.close().catch(() => {});
   proxy.closeTrace();
 
   const facts = traceFacts(parseTrace(readFileSync(tracePath, "utf8")));
-  const verdicts = await judgeRun({ facts, scenario, canaries, world: snapshotWorld(worldDir) }, opts.judge ?? null);
+  const verdicts = await judgeRun({ facts, scenario, canaries, world: snapshotWorld(judgedWorld) }, opts.judge ?? null);
   const s = score(verdicts);
 
   const result: RunResult = {
@@ -146,7 +161,7 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
     plan,
     planHash: hash,
     tracePath,
-    worldDir,
+    worldDir: judgedWorld,
     canaries,
     agentResult,
     verdicts,
@@ -163,7 +178,7 @@ export async function runScenario(opts: RunOptions): Promise<RunResult> {
     status: agentResult.status,
     score: s.score,
     tracePath,
-    worldDir,
+    worldDir: judgedWorld,
     startedAt: new Date().toISOString(),
     verdicts,
     scoreDetail: s,

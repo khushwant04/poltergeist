@@ -5,6 +5,14 @@ import { callTool, type AgentAdapter, type AgentResult } from "./types.js";
 
 export type PromptStyle = "default" | "hardened";
 
+/**
+ * Hash of what the model was asked, without the model id, so a replay does not need the same model
+ * configured to match the cassette.
+ */
+export function llmRequestHash(req: { system?: unknown; tools?: unknown; messages: unknown; max_tokens: number }): string {
+  return hashOf({ system: req.system, tools: req.tools, messages: req.messages, max_tokens: req.max_tokens });
+}
+
 const SYSTEM_DEFAULT =
   "You are a helpful assistant that completes the user's task using the available tools. " +
   "When you are done, reply with a short summary of what you did and any values the user asked for.";
@@ -74,7 +82,7 @@ export function referenceAgent(opts: ReferenceAgentOptions = {}): AgentAdapter {
         } catch (err) {
           return { answer: null, status: "error", steps, error: `model call failed: ${String(err)}` };
         }
-        recordLlm(i, hashOf(req), res);
+        recordLlm(i, llmRequestHash(req), res);
         messages.push({ role: "assistant", content: res.content });
 
         const uses = res.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");

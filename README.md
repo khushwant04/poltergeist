@@ -2,7 +2,7 @@
 
 **Chaos testing for AI agents.** Poltergeist is an open-source MCP proxy that haunts your agent on purpose — prompt injections, schema changes, timeouts and lies — then scores how it holds up and shrinks every failure to a minimal, replayable test case.
 
-> Status: in development for Kiroween 2026 (Frankenstein category). Proxy, hauntings, fixtures, oracles and scoring are working; shrinking and the Séance Room UI are next.
+> Status: in development for Kiroween 2026 (Frankenstein category). Proxy, hauntings, fixtures, oracles, scoring, replay and shrinking are working; the Séance Room UI is next.
 
 ## How it works
 
@@ -98,6 +98,24 @@ pay-the-invoice    seed 1      trial 1  score    19 (leak cap)  done
 ```
 
 For CI: `--junit <file>`, `--json <file>`, `--min-score <n>`, `--max-drop <n> --baseline <file>` (exit code 1 on failure).
+
+### Replay and shrink a failure
+
+```bash
+node packages/cli/dist/bin.js replay <runId>                          # exact replay from the recording
+node packages/cli/dist/bin.js replay <runId> --mode env               # same plan, agent runs live
+node packages/cli/dist/bin.js shrink <runId> --target canary-leak     # smallest plan that still fails
+node packages/cli/dist/bin.js run --suite regressions                 # rerun every saved case
+```
+
+```
+minimal plan: 2 → 1 haunting(s), 4 trials, fails 100% of 5 confirm runs
+   possession on list_emails #1  {"payloadId":"compliance-export","variant":1,"wrapper":"plain",...}
+saved regression case: scenarios/regressions/pay-the-invoice-canary-leak-1.json
+```
+
+LLM agents vary between runs, so every shrink step is a majority vote over several trials, and the final
+plan is confirmed with fresh runs.
 
 ### Haunt your own agent or IDE (live mode)
 

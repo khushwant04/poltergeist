@@ -11,6 +11,7 @@
       "@poltergeist/fixtures": ["packages/fixtures/src/index.ts"],
       "@poltergeist/oracles": ["packages/oracles/src/index.ts"],
       "@poltergeist/runner": ["packages/runner/src/index.ts"],
+      "@poltergeist/replay": ["packages/replay/src/index.ts"],
       "@poltergeist/cli": ["packages/cli/src/wrap.ts"]
     }
   },
