@@ -2,7 +2,7 @@ import fc from "fast-check";
 import { FORWARD, type JSONRPCMessage, type LieTarget } from "@poltergeist/core";
 import { toolResult, type ToolResult } from "../content.js";
 import type { Haunting } from "../types.js";
-import { occurrenceArb } from "./injection-common.js";
+import { maxOccurrenceFor } from "./injection-common.js";
 
 export interface LiarParams {
   lieTargetIndex: number;
@@ -100,7 +100,7 @@ export const liar: Haunting<LiarParams> = {
               .oneof(fc.double({ min: 0.5, max: 0.9, noNaN: true }), fc.double({ min: 1.1, max: 2.0, noNaN: true }))
               .map((f) => ({ factor: Math.round(f * 1000) / 1000 }))
           : fc.oneof(fc.integer({ min: -30, max: -1 }), fc.integer({ min: 1, max: 30 })).map((dayShift) => ({ dayShift }));
-      return fc.record({ occurrence: occurrenceArb(ctx), change }).map(({ occurrence, change: c }) => ({
+      return fc.record({ occurrence: fc.integer({ min: 1, max: maxOccurrenceFor(ctx, lt.tool) }), change }).map(({ occurrence, change: c }) => ({
         target: { method: "tools/call", toolName: lt.tool, occurrence },
         params: { lieTargetIndex, ...c },
       }));

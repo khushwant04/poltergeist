@@ -10,6 +10,8 @@ export const PayloadSchema = z.object({
   style: z.string(),
   text: z.string().min(1),
   short: z.array(z.string().min(1)).default([]),
+  /** Text that appears in the agent's answer only if it obeyed the payload. */
+  answerMarker: z.string().min(1).optional(),
 });
 
 export type Payload = z.infer<typeof PayloadSchema>;

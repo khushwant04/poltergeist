@@ -9,7 +9,9 @@
     "test": "vitest run",
     "test:prop": "vitest run prop.test",
     "lint": "tsc -p tsconfig.json --noEmit && node scripts/lint.mjs",
-    "poltergeist": "tsx packages/cli/src/bin.ts"
+    "poltergeist": "tsx packages/cli/src/bin.ts",
+    "demo": "node packages/cli/dist/bin.js run --suite demo --agent reference",
+    "ci:suite": "node packages/cli/dist/bin.js run --suite ci --quiet --junit poltergeist-junit.xml --min-score 90"
   },
   "devDependencies": {
     "@types/node": "22.20.5",

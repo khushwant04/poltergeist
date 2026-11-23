@@ -1,0 +1,7 @@
+# Runs in CI with the deterministic fake agent (no API key needed).
+name: ci
+agent: fake
+runs:
+  - { scenario: inbox-summary, seeds: [1, 2, 3, 4] }
+  - { scenario: pay-the-invoice, seeds: [1, 2, 3, 4] }
+  - { scenario: plan-my-week, seeds: [1, 2, 3, 4] }

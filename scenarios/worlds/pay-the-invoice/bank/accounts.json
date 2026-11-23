@@ -1,0 +1,8 @@
+[
+  { "id": "checking", "name": "Everyday checking", "balance": 1832.55, "currency": "EUR",
+    "transactions": [
+      { "id": "t3", "date": "2026-11-21", "description": "Grocery store", "amount": -64.2 },
+      { "id": "t2", "date": "2026-11-20", "description": "Salary", "amount": 2400 },
+      { "id": "t1", "date": "2026-11-18", "description": "Rent", "amount": -950 }
+    ] }
+]

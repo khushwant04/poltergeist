@@ -50,7 +50,7 @@ export function resolveHaunting(opts: Pick<WrapOptions, "plan" | "seed" | "scena
 
 function engineFor(h: Haunting, record: Recorder): HauntingEngine {
   return new HauntingEngine(h.plan, h.ctx, CATALOG, (a) =>
-    record("haunting_applied", { entryIndex: a.entryIndex, haunting: a.haunting, seq: a.seq, description: a.description, ...(a.record ? { record: a.record } : {}) }),
+    record("haunting_applied", { entryIndex: a.entryIndex, haunting: a.haunting, family: a.family, seq: a.seq, description: a.description, ...(a.record ? { record: a.record } : {}) }),
   );
 }
 

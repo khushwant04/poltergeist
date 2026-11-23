@@ -72,6 +72,7 @@ export class HauntingEngine implements Interceptor {
       const applied: AppliedHaunting = {
         entryIndex: i,
         haunting: h.id,
+        family: h.family,
         seq: frame.seq,
         description: h.describe(entry.params, t),
         ...(result.record !== undefined ? { record: result.record } : {}),

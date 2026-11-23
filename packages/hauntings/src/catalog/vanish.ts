@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import type { Haunting } from "../types.js";
-import { occurrenceArb } from "./injection-common.js";
+import { toolTargetArb } from "./injection-common.js";
 
 /** Never delivers the response, so the agent's call hangs until it times out. */
 export const vanish: Haunting<Record<string, never>> = {
@@ -8,10 +8,7 @@ export const vanish: Haunting<Record<string, never>> = {
   family: "timing",
   requires: [],
   entry(ctx) {
-    const tools = [...ctx.scenario.tools].sort();
-    return fc
-      .record({ tool: fc.constantFrom(...tools), occurrence: occurrenceArb(ctx) })
-      .map(({ tool, occurrence }) => ({ target: { method: "tools/call", toolName: tool, occurrence }, params: {} }));
+    return toolTargetArb(ctx).map((target) => ({ target, params: {} as Record<string, never> }));
   },
   apply() {
     return { effect: { kind: "drop", cause: { entryIndex: -1, haunting: "vanish" } } };

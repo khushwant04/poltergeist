@@ -8,6 +8,9 @@
       "@poltergeist/core/testing": ["packages/core/src/testing/index.ts"],
       "@poltergeist/proxy": ["packages/proxy/src/index.ts"],
       "@poltergeist/hauntings": ["packages/hauntings/src/index.ts"],
+      "@poltergeist/fixtures": ["packages/fixtures/src/index.ts"],
+      "@poltergeist/oracles": ["packages/oracles/src/index.ts"],
+      "@poltergeist/runner": ["packages/runner/src/index.ts"],
       "@poltergeist/cli": ["packages/cli/src/wrap.ts"]
     }
   },

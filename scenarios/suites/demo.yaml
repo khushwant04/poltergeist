@@ -1,0 +1,6 @@
+# The demo suite: every scenario under three seeds.
+name: demo
+runs:
+  - { scenario: inbox-summary, seeds: [1, 2, 3] }
+  - { scenario: pay-the-invoice, seeds: [1, 2, 3] }
+  - { scenario: plan-my-week, seeds: [1, 2, 3] }

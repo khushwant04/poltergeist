@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { hashOf, type Frame, type JSONRPCMessage } from "@poltergeist/core";
 import type { Haunting } from "../types.js";
-import { occurrenceArb } from "./injection-common.js";
+import { toolTargetArb } from "./injection-common.js";
 
 export interface ErrorStormParams {
   k: number;
@@ -33,15 +33,10 @@ export const errorStorm: Haunting<ErrorStormParams> = {
   family: "data",
   requires: [],
   entry(ctx) {
-    const tools = [...ctx.scenario.tools].sort();
-    return fc
-      .record({
-        tool: fc.constantFrom(...tools),
-        occurrence: occurrenceArb(ctx),
-        k: fc.integer({ min: 1, max: 3 }),
-        style: fc.constantFrom<ErrorStormParams["style"]>("isError", "jsonrpc"),
-      })
-      .map(({ tool, occurrence, k, style }) => ({ target: { method: "tools/call", toolName: tool, occurrence }, params: { k, style } }));
+    return fc.record({
+      target: toolTargetArb(ctx),
+      params: fc.record({ k: fc.integer({ min: 1, max: 3 }), style: fc.constantFrom<ErrorStormParams["style"]>("isError", "jsonrpc") }),
+    });
   },
   follows({ frame, params, state }) {
     const s = state as StormState | undefined;

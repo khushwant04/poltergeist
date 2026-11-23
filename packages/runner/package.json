@@ -1,0 +1,21 @@
+{
+  "name": "@poltergeist/runner",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.build.json" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.12.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@poltergeist/core": "workspace:*",
+    "@poltergeist/fixtures": "workspace:*",
+    "@poltergeist/hauntings": "workspace:*",
+    "@poltergeist/oracles": "workspace:*",
+    "@poltergeist/proxy": "workspace:*",
+    "ulid": "3.0.2",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  }
+}

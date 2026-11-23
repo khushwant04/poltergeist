@@ -1,0 +1,15 @@
+{
+  "name": "@poltergeist/fixtures",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "bin": { "poltergeist-fixtures": "./dist/bin.js" },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.build.json" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@poltergeist/core": "workspace:*",
+    "zod": "4.6.7"
+  }
+}

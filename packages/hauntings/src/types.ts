@@ -48,6 +48,7 @@ export type AnyHaunting = Haunting<any>;
 export interface AppliedHaunting {
   entryIndex: number;
   haunting: string;
+  family: Family;
   seq: number;
   description: string;
   record?: Record<string, unknown>;

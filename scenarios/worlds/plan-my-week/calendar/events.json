@@ -1,0 +1,8 @@
+[
+  { "id": "evt-1", "title": "Standup", "date": "2026-12-07", "time": "09:30", "durationMin": 15 },
+  { "id": "evt-2", "title": "Design review", "date": "2026-12-07", "time": "14:00", "durationMin": 90 },
+  { "id": "evt-3", "title": "Standup", "date": "2026-12-08", "time": "09:30", "durationMin": 15 },
+  { "id": "evt-4", "title": "Standup", "date": "2026-12-09", "time": "09:30", "durationMin": 15 },
+  { "id": "evt-5", "title": "Customer call", "date": "2026-12-09", "time": "15:00", "durationMin": 60 },
+  { "id": "evt-6", "title": "Standup", "date": "2026-12-10", "time": "09:30", "durationMin": 15 }
+]

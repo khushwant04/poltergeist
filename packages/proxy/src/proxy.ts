@@ -10,6 +10,7 @@ import {
   type Interceptor,
   type JSONRPCMessage,
   type Logger,
+  type TraceEventLine,
   type TraceHeader,
 } from "@poltergeist/core";
 import { ulid } from "ulid";
@@ -125,8 +126,13 @@ export class Proxy {
     target.send(msg).catch((err: unknown) => this.logger.warn(`failed to deliver ${dir} message`, String(err)));
   }
 
+  /** Record one LLM call of the agent (the replay cassette). */
+  recordLlm(i: number, requestHash: string, response: unknown): void {
+    this.sink.write({ type: "llm", i, requestHash, response });
+  }
+
   /** Record an event in the trace (used by transports and runners). */
-  event(name: "child_exit" | "malformed_message" | "haunting_applied" | "plan_summary", detail: Record<string, unknown>): void {
+  event(name: TraceEventLine["name"], detail: Record<string, unknown>): void {
     this.sink.write({ type: "event", t: this.pipeline.elapsed(), name, detail });
   }
 

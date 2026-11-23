@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { parse } from "yaml";
-import { PoltergeistError, ScenarioSchema, deriveCanaries, type Scenario, type ScenarioContext } from "@poltergeist/core";
+import { PoltergeistError, ScenarioSchema, deriveCanaries, scenarioProblems, type Scenario, type ScenarioContext } from "@poltergeist/core";
 
 /** Load and validate a scenario YAML file. */
 export function loadScenario(path: string): Scenario {
@@ -16,6 +16,8 @@ export function loadScenario(path: string): Scenario {
     const where = issue && issue.path.length > 0 ? issue.path.join(".") : "(root)";
     throw new PoltergeistError("invalid_input", `invalid scenario ${path}: field "${where}": ${issue?.message ?? "invalid"}`);
   }
+  const problems = scenarioProblems(parsed.data);
+  if (problems.length > 0) throw new PoltergeistError("invalid_input", `invalid scenario ${path}: ${problems[0]}`);
   return parsed.data;
 }
 

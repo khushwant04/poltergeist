@@ -123,6 +123,9 @@ export const TraceEventSchema = z.object({
     "malformed_message",
     "haunting_applied",
     "plan_summary",
+    "run_context",
+    "answer",
+    "agent_status",
   ]),
   detail: z.record(z.string(), z.unknown()),
 });

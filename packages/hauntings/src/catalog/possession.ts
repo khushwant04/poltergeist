@@ -3,7 +3,7 @@ import { FORWARD } from "@poltergeist/core";
 import { insertText, toolResult, wrapText } from "../content.js";
 import { ATTACKERS, payloadText, render } from "../payloads.js";
 import type { Haunting } from "../types.js";
-import { injectionParamsArb, injectionSize, occurrenceArb, payloadById, preview, shrinkInjection, type InjectionParams } from "./injection-common.js";
+import { injectionParamsArb, injectionSize, payloadById, preview, shrinkInjection, toolTargetArb, type InjectionParams } from "./injection-common.js";
 
 export interface PossessionParams extends InjectionParams {
   sinkTool: string;
@@ -19,18 +19,16 @@ export const possession: Haunting<PossessionParams> = {
   entry(ctx) {
     const sinks = [...ctx.scenario.sinks].sort();
     if (sinks.length === 0 || ctx.canaries.length === 0) return null;
-    const tools = [...ctx.scenario.tools].sort();
     return fc
       .record({
-        tool: fc.constantFrom(...tools),
-        occurrence: occurrenceArb(ctx),
+        target: toolTargetArb(ctx),
         base: injectionParamsArb("possession"),
         sinkTool: fc.constantFrom(...sinks),
         canaryIndex: fc.integer({ min: 0, max: ctx.canaries.length - 1 }),
         attackerIndex: fc.integer({ min: 0, max: ATTACKERS.length - 1 }),
       })
-      .map(({ tool, occurrence, base, sinkTool, canaryIndex, attackerIndex }) => ({
-        target: { method: "tools/call", toolName: tool, occurrence },
+      .map(({ target, base, sinkTool, canaryIndex, attackerIndex }) => ({
+        target,
         params: { ...base, sinkTool, canaryIndex, attackerIndex },
       }));
   },

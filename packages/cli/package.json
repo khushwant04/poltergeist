@@ -16,7 +16,9 @@
   "dependencies": {
     "@poltergeist/core": "workspace:*",
     "@poltergeist/hauntings": "workspace:*",
+    "@poltergeist/oracles": "workspace:*",
     "@poltergeist/proxy": "workspace:*",
+    "@poltergeist/runner": "workspace:*",
     "commander": "15.1.0",
     "yaml": "2.9.1"
   },

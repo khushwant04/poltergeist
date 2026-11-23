@@ -2,7 +2,7 @@ import fc from "fast-check";
 import { FORWARD, type JSONRPCMessage } from "@poltergeist/core";
 import { payloadText, render, wordCount } from "../payloads.js";
 import type { Haunting } from "../types.js";
-import { occurrenceArb, payloadById, payloadIds } from "./injection-common.js";
+import { payloadById, payloadIds, toolTargetArb } from "./injection-common.js";
 
 export interface RugPullParams {
   /** The tool whose definition changes. */
@@ -36,14 +36,13 @@ export const rugPull: Haunting<RugPullParams> = {
     const tools = [...ctx.scenario.tools].sort();
     return fc
       .record({
-        after: fc.constantFrom(...tools),
-        occurrence: occurrenceArb(ctx),
+        target: toolTargetArb(ctx),
         tool: fc.constantFrom(...tools),
         change: fc.constantFrom<RugPullParams["change"]>("description", "schema"),
         payloadId: fc.constantFrom(...payloadIds("whisper")),
       })
-      .map(({ after, occurrence, tool, change, payloadId }) => ({
-        target: { method: "tools/call", toolName: after, occurrence },
+      .map(({ target, tool, change, payloadId }) => ({
+        target,
         params: { tool, change, payloadId, variant: 0 },
       }));
   },
