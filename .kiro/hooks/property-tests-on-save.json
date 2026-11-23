@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run property tests on save",
+      "description": "When a source file in a core package is saved, run the property-based test suite so a broken property shows up immediately. See .kiro/steering/testing.md.",
+      "trigger": "PostFileSave",
+      "matcher": "packages/(core|proxy|hauntings|oracles|replay)/src/.*\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "if [ -f package.json ]; then pnpm -s test:prop; else echo 'No package.json yet: skipping property tests.'; fi"
+      },
+      "timeout": 180
+    }
+  ]
+}

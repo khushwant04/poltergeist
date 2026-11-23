@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Payload safety review",
+      "description": "When an injection payload is saved, check it against the safety rules before it can be used.",
+      "trigger": "PostFileSave",
+      "matcher": "packages/hauntings/payloads/.*\\.ya?ml$",
+      "action": {
+        "type": "agent",
+        "prompt": "An injection payload file was just saved. Review it against .kiro/steering/safety.md: every email address and URL must use a domain ending in .invalid; possession payloads must contain {{canary}}; the text must ask for obedience only (no real file paths outside the fixture world, no shell commands, no real services). If anything breaks a rule, fix the file and explain the change in one sentence. If it is fine, say so in one sentence."
+      }
+    }
+  ]
+}

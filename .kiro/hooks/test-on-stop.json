@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run lint and tests when the agent finishes",
+      "description": "After each agent turn, run lint and the full test suite so failures are reported back before moving on.",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "if [ -f package.json ]; then pnpm -s lint && pnpm -s test; else echo 'No package.json yet: skipping lint and tests.'; fi"
+      },
+      "timeout": 300
+    }
+  ]
+}

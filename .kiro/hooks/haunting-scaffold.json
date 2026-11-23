@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Scaffold tests and docs for a haunting",
+      "description": "When a haunting plugin is saved, make sure it has its property tests and a catalogue entry.",
+      "trigger": "PostFileSave",
+      "matcher": "packages/hauntings/src/catalog/[^/]+\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "A haunting plugin in packages/hauntings/src/catalog/ was just saved. Check that (1) it has a sibling <name>.prop.test.ts that covers at least 'apply is pure and deterministic' and 'shrinking makes params smaller' (haunting-engine design, Properties 4 and 9), following .kiro/steering/testing.md, and (2) docs/hauntings.md has an entry with its id, family, what it does and what it tests, in plain language. Create or update whatever is missing. If this is a new haunting, remind me that catalogVersion must be bumped. Do not change the plugin itself."
+      }
+    }
+  ]
+}

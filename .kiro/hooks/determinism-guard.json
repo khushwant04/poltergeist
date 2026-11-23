@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Determinism guard",
+      "description": "Blocks ambient randomness and time in code that must be deterministic. See .kiro/steering/determinism.md.",
+      "trigger": "PostFileSave",
+      "matcher": "packages/(hauntings|oracles|replay)/src/.*\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "out=$(grep -rnE 'Math\\.random|crypto\\.randomUUID|getRandomValues|Date\\.now\\(|new Date\\(' packages/hauntings/src packages/oracles/src packages/replay/src --include='*.ts' 2>/dev/null | grep -v '\\.test\\.ts'); if [ -n \"$out\" ]; then printf 'Determinism rule broken. Use the seeded RNG or the injected Clock instead (.kiro/steering/determinism.md):\\n%s\\n' \"$out\" >&2; exit 1; fi; echo 'Determinism guard: OK'"
+      },
+      "timeout": 30
+    }
+  ]
+}

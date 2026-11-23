@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Keep specs consistent",
+      "description": "When a spec's requirements change, check that its design properties and tasks still point at valid requirements.",
+      "trigger": "PostFileSave",
+      "matcher": "\\.kiro/specs/[^/]+/requirements\\.md$",
+      "action": {
+        "type": "agent",
+        "prompt": "A requirements.md in .kiro/specs/ was just saved. In the same spec folder, check that every 'Validates: Requirements X.Y' in design.md and every '_Requirements: X.Y_' in tasks.md refers to an acceptance criterion that still exists, and that every acceptance criterion is covered by at least one task. List any mismatches and propose the smallest edits to fix them. Do not edit requirements.md itself."
+      }
+    }
+  ]
+}
